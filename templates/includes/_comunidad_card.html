@@ -1,0 +1,11 @@
+<a class="com" href="{{ c.get_absolute_url }}">
+  <div class="com-top">
+    <span class="logo{% if c.es_emergente %} em{% endif %}">{{ c.iniciales }}</span>
+    <div style="min-width:0"><h3>{{ c.nombre }}</h3><span class="cat">{{ c.get_categoria_display }}</span></div>
+  </div>
+  <p>{{ c.descripcion }}</p>
+  <div class="com-foot">
+    {% include 'includes/_tipo_badge.html' %}
+    {% if c.n_integrantes is not None %}<span class="tnum">{{ c.n_integrantes }} integrantes · {{ c.n_eventos }} evento{{ c.n_eventos|pluralize }}</span>{% endif %}
+  </div>
+</a>

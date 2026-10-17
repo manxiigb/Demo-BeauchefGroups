@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Eventos · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div><h1>Eventos{% pi 'P-15 / I1' %}</h1><p class="muted">Actividades presenciales y remotas de todas las comunidades.</p></div></div>
+<nav class="seg" aria-label="Filtrar eventos" style="align-self:flex-start;flex-wrap:wrap">
+  {% for valor, etiqueta in filtros %}
+    <a class="seg-a" href="?f={{ valor }}" aria-current="{% if f == valor %}true{% else %}false{% endif %}">{{ etiqueta }}</a>
+  {% endfor %}
+</nav>
+{% if eventos %}
+  <div class="grid-ev">{% for e in eventos %}{% include 'includes/_evento_card.html' %}{% endfor %}</div>
+{% else %}
+  <div class="empty">No hay eventos con este filtro. <a href="?f=todos">Ver todos los eventos</a>.</div>
+{% endif %}
+{% endblock %}

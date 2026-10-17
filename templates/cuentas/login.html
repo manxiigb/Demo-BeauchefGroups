@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Ingresar · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="login">
+  <h1 style="font-size:1.6rem">Ingresa a Comunidades Beauchef{% pi 'P-12 / I1' %}</h1>
+  <p class="muted">Usamos tu cuenta institucional para verificar que eres parte de la FCFM. No guardamos tu contraseña.</p>
+  <form method="post">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="pasaporte" style="width:100%">{% icono 'shield' 20 %} Ingresar con cuenta U. de Chile</button>
+  </form>
+  <p class="small muted">En esta demo el botón te ingresa como Valentina Rojas (estudiante). La conexión real con la U. de Chile se configura en el incremento 1.</p>
+  <p class="small muted">Sin cuenta puedes ver eventos abiertos y el directorio, pero no inscribirte ni escribir en los muros.</p>
+  <a class="btn btn-g" href="{% url 'core:inicio' %}" style="align-self:flex-start;padding-left:0">Seguir como visitante</a>
+</div>
+{% endblock %}

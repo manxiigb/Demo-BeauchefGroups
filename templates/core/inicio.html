@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block contenido %}
+
+{% if por_confirmar %}{% with e=por_confirmar.evento %}
+<div class="confirm">
+  <div class="confirm-txt"><b>¿Vas a {{ e.titulo }}?</b>{% pi 'P-13' %}
+    <p class="small" style="margin-top:4px">{{ e.inicio|date:"l j \d\e F, H:i"|capfirst }} · {{ e.lugar }}. Si no puedes ir, tu cupo pasa a la siguiente persona en lista de espera.</p></div>
+  <form class="row" method="post" action="{% url 'eventos:confirmar' e.pk %}">{% csrf_token %}
+    <button class="btn btn-ok" name="va" value="si">Sí, voy</button>
+    <button class="btn btn-s" name="va" value="no">No podré ir</button>
+  </form>
+</div>
+{% endwith %}{% endif %}
+
+<section class="hero">
+  <div>
+    {% if user.is_authenticated %}
+      <h1>Hola, {{ user.first_name }}. ¿Qué pasa en Beauchef esta semana?</h1>
+      <p>Eventos con cupo, comunidades nuevas y los avisos de los grupos que sigues, sin buscar entre U-Cursos, Instagram y grupos de WhatsApp.</p>
+    {% else %}
+      <h1>Todas las comunidades de Beauchef en un solo lugar</h1>
+      <p>Encuentra GG.OO. reconocidos y grupos emergentes de la FCFM, revisa sus eventos e inscríbete con tu cuenta U. de Chile.</p>
+    {% endif %}
+    <div class="row">
+      <a class="btn btn-p" href="{% url 'comunidades:lista' %}">Explorar comunidades</a>
+      {% if user.is_authenticated %}<a class="btn btn-s" href="{% url 'eventos:lista' %}">Ver eventos de la semana</a>
+      {% else %}<a class="btn btn-s" href="{% url 'core:login' %}">Ingresar con cuenta U. de Chile</a>{% endif %}
+    </div>
+  </div>
+  <div class="mural" aria-hidden="true">
+    {% for e in afiches %}
+      <div class="afiche a{{ forloop.counter }}"><span class="pin"></span>
+        {% if e.comunidad.es_emergente %}<span class="tipo tipo-emergente" style="font-size:.7rem">Grupo emergente</span>{% else %}<span class="cat">{{ e.comunidad.nombre }}</span>{% endif %}
+        <b>{{ e.titulo|truncatechars:30 }}</b>
+        <span class="estado {{ e.nivel_cupos }}">{% if e.libres == 0 %}Lleno{% if e.en_espera %} · {{ e.en_espera }} en espera{% endif %}{% elif e.libres == 1 %}Queda 1 cupo{% else %}{{ e.libres }} cupos{% endif %}</span>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="stack">
+  <div class="head"><div><h2>Próximos eventos{% pi 'P-15 / I1' %}</h2></div><a class="btn btn-g" href="{% url 'eventos:lista' %}">Ver todos</a></div>
+  {% if proximos %}
+    <div class="grid-ev">{% for e in proximos %}{% include 'includes/_evento_card.html' %}{% endfor %}</div>
+  {% else %}
+    <div class="empty">No hay eventos próximos. Cuando una comunidad publique uno, aparecerá aquí.</div>
+  {% endif %}
+</section>
+
+{% if emergentes %}
+<section class="stack">
+  <div class="head"><div><h2>Grupos que recién empiezan{% pi 'P-39 Incubadora' %}</h2>
+    <p class="muted">Comunidades formadas este año que todavía no tienen reconocimiento formal. Súmate desde el principio.</p></div>
+    <a class="btn btn-g" href="{% url 'comunidades:lista' %}?tipo=emergente">Ver emergentes</a></div>
+  <div class="grid-com">{% for c in emergentes %}{% include 'includes/_comunidad_card.html' %}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

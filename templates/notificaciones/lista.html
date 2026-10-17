@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Notificaciones · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head">
+  <div><h1>Notificaciones</h1><p class="muted">Recordatorios, respuestas y avisos de tus comunidades.</p></div>
+  {% if notif_sin_leer %}<form method="post" action="{% url 'notificaciones:marcar_todas' %}">{% csrf_token %}<button class="btn btn-s">Marcar todas como leídas</button></form>{% endif %}
+</div>
+<div class="panel">
+  {% if notificaciones %}
+  <div class="list">
+    {% for n in notificaciones %}
+      <div class="li{% if not n.leida %} unread{% endif %}">
+        <span class="li-ic {{ n.tono }}">{% icono n.icono %}</span>
+        <div class="li-body">
+          <b>{{ n.titulo }}</b>
+          {% if n.texto %}<span class="small muted">{{ n.texto }}</span>{% endif %}
+          <span class="small muted">hace {{ n.creada|timesince }}</span>
+          {% if n.evento_id %}
+            <form class="row" style="margin-top:6px" method="post" action="{% url 'eventos:confirmar' n.evento_id %}">{% csrf_token %}
+              <input type="hidden" name="volver" value="{% url 'notificaciones:lista' %}">
+              <button class="btn btn-ok" name="va" value="si">Sí, voy</button>
+              <button class="btn btn-s" name="va" value="no">No podré ir</button>
+            </form>
+          {% endif %}
+        </div>
+        {% if n.url %}<a class="btn btn-g" href="{% url 'notificaciones:abrir' n.pk %}">Ver</a>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="muted">No tienes notificaciones todavía. Te avisaremos cuando haya novedades en tus eventos y comunidades.</p>
+  {% endif %}
+</div>
+{% endblock %}

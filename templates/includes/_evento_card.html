@@ -1,0 +1,13 @@
+<a class="ev" href="{{ e.get_absolute_url }}">
+  <div class="ev-date"><span class="w">{{ e.inicio|date:"D" }}</span><span class="d tnum">{{ e.inicio|date:"j" }}</span><span class="m">{{ e.inicio|date:"M"|lower }}</span></div>
+  <div class="ev-body">
+    <div class="row between" style="gap:6px">
+      <span class="cat">{{ e.comunidad.nombre }}</span>
+      {% if e.mi_estado == 'confirmada' %}<span class="chip" style="color:var(--ok);border-color:var(--ok)">Inscrito</span>
+      {% elif e.mi_estado == 'espera' %}<span class="chip" style="color:var(--warn);border-color:var(--warn)">En lista de espera</span>{% endif %}
+    </div>
+    <h3>{{ e.titulo }}</h3>
+    <div class="ev-meta"><span class="tnum">{{ e.inicio|time:"H:i" }}–{{ e.fin|time:"H:i" }}</span><span>{{ e.get_modalidad_display }} · {{ e.lugar }}</span></div>
+    {% include 'includes/_cupos.html' %}
+  </div>
+</a>

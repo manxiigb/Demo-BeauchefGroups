@@ -1,0 +1,14 @@
+{% load ui %}{% comment %}Medidor de cupos: un casillero por cupo (P-10 / P-14). Recibe «e».{% endcomment %}
+<div class="cupos">
+  <div class="row between">
+    {% if e.libres == 0 %}<span class="estado bad">Lleno{% if e.en_espera %} · {{ e.en_espera }} en lista de espera{% endif %}</span>
+    {% elif e.libres <= 3 %}<span class="estado warn">{% if e.libres == 1 %}Queda 1 cupo{% else %}Quedan {{ e.libres }} cupos{% endif %}</span>
+    {% else %}<span class="estado ok">{{ e.libres }} cupos disponibles</span>{% endif %}
+    <span class="small muted tnum">{{ e.inscritos }}/{{ e.cupos }}</span>
+  </div>
+  {% if e.cupos <= 40 %}
+    <div class="seats" aria-hidden="true">{% for i in e.cupos|rango %}<span class="seat{% if i < e.inscritos %} on{% endif %}{% if e.mi_estado == 'confirmada' and forloop.counter == e.inscritos %} me{% endif %}"></span>{% endfor %}</div>
+  {% else %}
+    <div class="bar" aria-hidden="true"><i style="width:{{ e.porcentaje }}%"></i></div>
+  {% endif %}
+</div>

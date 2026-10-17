@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Mis inscripciones · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div><h1>Mis inscripciones</h1><p class="muted">Tus cupos confirmados y las listas de espera en las que estás.</p></div></div>
+<section class="stack"><h2>Confirmadas</h2>
+  {% if confirmadas %}<div class="grid-ev">{% for e in confirmadas %}{% include 'includes/_evento_card.html' %}{% endfor %}</div>
+  {% else %}<div class="empty">No tienes inscripciones. <a href="{% url 'eventos:lista' %}?f=cupos">Revisa los eventos con cupo</a>.</div>{% endif %}
+</section>
+<section class="stack"><h2>En lista de espera{% pi 'P-14' %}</h2>
+  {% if en_espera %}<div class="grid-ev">{% for e in en_espera %}{% include 'includes/_evento_card.html' %}{% endfor %}</div>
+  {% else %}<p class="muted">No estás en ninguna lista de espera.</p>{% endif %}
+</section>
+{% endblock %}

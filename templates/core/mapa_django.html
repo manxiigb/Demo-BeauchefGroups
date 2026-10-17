@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block titulo %}Mapa del proyecto · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div><h1>Mapa del proyecto</h1>
+  <p class="muted" style="max-width:66ch">Qué vista, plantilla y modelos hay detrás de cada pantalla. Útil para repartir trabajo entre el equipo y para la presentación.</p></div></div>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>Pantalla</th><th>URL</th><th>Vista</th><th>Plantilla</th><th>Modelos</th><th>Inc.</th></tr></thead>
+  <tbody>
+    <tr><td>Inicio</td><td><code>/</code></td><td><code>core.views.inicio</code></td><td><code>core/inicio.html</code></td><td>Evento, Comunidad, Inscripcion</td><td>I1</td></tr>
+    <tr><td>Ingreso</td><td><code>/cuentas/ingresar/</code></td><td><code>core.views.ingresar</code></td><td><code>cuentas/login.html</code></td><td>User</td><td>I1</td></tr>
+    <tr><td>Directorio</td><td><code>/comunidades/?q=&amp;tipo=&amp;cat=</code></td><td><code>comunidades.views.lista</code></td><td><code>comunidades/lista.html</code></td><td>Comunidad</td><td>I1</td></tr>
+    <tr><td>Ficha comunidad</td><td><code>/comunidades/&lt;slug&gt;/?tab=</code></td><td><code>comunidades.views.detalle</code></td><td><code>comunidades/detalle.html</code></td><td>Comunidad, Membresia, Mensaje</td><td>I1 / I2</td></tr>
+    <tr><td>Registrar / editar</td><td><code>/comunidades/nueva/</code>, <code>…/editar/</code></td><td><code>nueva</code>, <code>editar</code></td><td><code>comunidades/form.html</code></td><td>Comunidad</td><td>I1</td></tr>
+    <tr><td>Eventos</td><td><code>/eventos/?f=</code></td><td><code>eventos.views.lista</code></td><td><code>eventos/lista.html</code></td><td>Evento</td><td>I1</td></tr>
+    <tr><td>Ficha evento</td><td><code>/eventos/&lt;id&gt;/</code></td><td><code>eventos.views.detalle</code></td><td><code>eventos/detalle.html</code></td><td>Evento, Inscripcion, Mensaje</td><td>I1 / I2</td></tr>
+    <tr><td>RSVP / cancelar / espera</td><td><code>POST /eventos/&lt;id&gt;/inscripcion/</code></td><td><code>eventos.views.inscripcion</code> → <code>services.py</code></td><td>redirige a la ficha</td><td>Inscripcion</td><td>I1 / I2</td></tr>
+    <tr><td>Confirmar asistencia</td><td><code>POST /eventos/&lt;id&gt;/confirmar/</code></td><td><code>eventos.views.confirmar</code></td><td>redirige</td><td>Inscripcion</td><td>I2</td></tr>
+    <tr><td>Publicar evento</td><td><code>/eventos/nuevo/</code></td><td><code>eventos.views.nuevo</code></td><td><code>eventos/form.html</code></td><td>Evento</td><td>I1</td></tr>
+    <tr><td>Mis inscripciones</td><td><code>/eventos/mis-inscripciones/</code></td><td><code>eventos.views.mis_inscripciones</code></td><td><code>eventos/mis_inscripciones.html</code></td><td>Inscripcion</td><td>I1</td></tr>
+    <tr><td>Notificaciones</td><td><code>/notificaciones/</code></td><td><code>notificaciones.views.lista</code></td><td><code>notificaciones/lista.html</code></td><td>Notificacion</td><td>I2</td></tr>
+    <tr><td>Reportar mensaje</td><td><code>POST /moderacion/mensajes/&lt;id&gt;/reportar/</code></td><td><code>moderacion.views.reportar</code></td><td><code>includes/_mensaje.html</code></td><td>Reporte</td><td>I3</td></tr>
+    <tr><td>Moderación</td><td><code>/moderacion/</code></td><td><code>moderacion.views.panel</code> (staff)</td><td><code>moderacion/panel.html</code></td><td>Reporte, Comunidad</td><td>I3</td></tr>
+  </tbody></table></div>
+<div class="two">
+  <div class="panel stack"><h2>Parciales reutilizables</h2>
+    <div class="tbl-wrap"><table style="min-width:0"><tbody>
+      <tr><td><code>includes/_evento_card.html</code></td><td>Tarjeta con talón de fecha</td></tr>
+      <tr><td><code>includes/_comunidad_card.html</code></td><td>Tarjeta del directorio</td></tr>
+      <tr><td><code>includes/_cupos.html</code></td><td>Casilleros de cupos y estado</td></tr>
+      <tr><td><code>includes/_tipo_badge.html</code></td><td>Reconocido / emergente</td></tr>
+      <tr><td><code>includes/_mensaje.html</code></td><td>Mensaje de muro o foro, con reporte</td></tr>
+      <tr><td><code>includes/_campo.html</code></td><td>Campo de formulario con errores</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="panel stack"><h2>Pendiente para los próximos incrementos</h2>
+    <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li><b>OAuth U. de Chile (P-12):</b> reemplazar <code>core.views.ingresar</code> por django-allauth u OIDC.</li>
+      <li><b>Recordatorios T-24h / T-2h (P-13, P-17) y resumen matutino (P-22):</b> tarea programada (Celery beat o un management command en cron) que cree <code>Notificacion</code>.</li>
+      <li><b>Envío push / correo (P-36):</b> extender <code>notificaciones/services.py</code>.</li>
+      <li><b>PostgreSQL y despliegue:</b> cambiar <code>DATABASES</code> y sacar <code>SECRET_KEY</code> a variables de entorno.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

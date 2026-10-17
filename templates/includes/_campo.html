@@ -1,0 +1,7 @@
+{% comment %}Campo de formulario con etiqueta, ayuda y errores. Recibe «f» (BoundField) y opcional «full».{% endcomment %}
+<div class="field{% if full %} full{% endif %}">
+  <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+  {{ f.errors }}
+  {{ f }}
+  {% if f.help_text %}<span class="hint">{{ f.help_text }}</span>{% endif %}
+</div>

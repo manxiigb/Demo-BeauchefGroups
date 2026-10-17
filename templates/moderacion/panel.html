@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Moderación · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div><h1>Moderación{% pi 'P-39 / I3' %}</h1><p class="muted">Reportes de contenido y solicitudes de nuevas comunidades.</p></div></div>
+<div class="stats">
+  <div class="stat"><b class="tnum">{{ n_pendientes }}</b><span>Reportes pendientes</span></div>
+  <div class="stat"><b class="tnum">{{ solicitudes|length }}</b><span>Comunidades por revisar</span></div>
+  <div class="stat"><b class="tnum">{{ n_resueltos }}</b><span>Resueltos este mes</span></div>
+  <div class="stat"><b class="tnum">{{ n_activas }}</b><span>Comunidades activas</span></div>
+</div>
+<div class="two">
+  <section class="stack">
+    <h2>Reportes{% pi 'P-40' %}</h2>
+    {% for r in reportes %}
+      <div class="case {% if r.grave %}sev{% else %}sev-m{% endif %}{% if r.estado != 'pendiente' %} resolved{% endif %}">
+        <div class="row between"><span class="estado {% if r.grave %}bad{% else %}warn{% endif %}">{{ r.get_motivo_display }}</span><span class="small muted">hace {{ r.creado|timesince }}</span></div>
+        <div class="quote">“{{ r.mensaje.texto }}”</div>
+        <span class="small muted">Escrito por {{ r.mensaje.autor.get_full_name }} en
+          <a href="{{ r.mensaje.get_absolute_url }}">{% if r.mensaje.evento_id %}{{ r.mensaje.evento.titulo }}{% else %}foro de {{ r.mensaje.comunidad.nombre }}{% endif %}</a>
+          · reportado por {{ r.reportado_por.get_full_name }}</span>
+        {% if r.estado == 'pendiente' %}
+          <form class="row" method="post" action="{% url 'moderacion:resolver' r.pk %}">{% csrf_token %}
+            <button class="btn btn-d" name="accion" value="ocultar">Ocultar mensaje</button>
+            <button class="btn btn-s" name="accion" value="descartar">Descartar reporte</button>
+          </form>
+        {% else %}
+          <span class="small"><b>{{ r.get_estado_display }}</b>{% if r.resuelto_por %} por {{ r.resuelto_por.get_full_name }}{% endif %}</span>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div class="empty">No hay reportes. Cuando alguien reporte un mensaje aparecerá aquí.</div>
+    {% endfor %}
+  </section>
+  <section class="stack">
+    <h2>Nuevas comunidades{% pi 'P-21' %}</h2>
+    {% for c in solicitudes %}
+      <div class="case">
+        <div class="row">{% include 'includes/_tipo_badge.html' %}<span class="cat">{{ c.get_categoria_display }}</span></div>
+        <h3>{{ c.nombre }}</h3><p class="small muted">{{ c.descripcion }}</p>
+        <span class="small muted">Solicitado por {{ c.creada_por.get_full_name|default:"—" }} · hace {{ c.creada|timesince }}</span>
+        <form class="row" method="post" action="{% url 'moderacion:revisar_comunidad' c.pk %}">{% csrf_token %}
+          <button class="btn btn-ok" name="accion" value="aprobar">Publicar en el directorio</button>
+          <button class="btn btn-s" name="accion" value="observar">Pedir más información</button>
+        </form>
+      </div>
+    {% empty %}
+      <div class="empty">No hay solicitudes pendientes.</div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

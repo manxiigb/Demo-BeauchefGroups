@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}{% if editando %}Editar ficha{% else %}Registrar comunidad{% endif %} · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div>
+  {% if editando %}<h1>Editar ficha de {{ c.nombre }}</h1>
+  {% else %}<h1>Registrar comunidad{% pi 'P-32 / I1' %}</h1>
+    <p class="muted" style="max-width:60ch">Los grupos emergentes aparecen en el directorio apenas administración revisa que la ficha esté completa. No necesitas reconocimiento formal de la facultad para empezar.</p>{% endif %}
+</div></div>
+<form class="panel form" method="post" novalidate>{% csrf_token %}
+  {% include 'includes/_campo.html' with f=form.nombre full=1 %}
+  <div class="field full"><label>Tipo{% pi 'P-27 Adaptabilidad' %}</label>{{ form.tipo.errors }}
+    <div class="radio-cards">
+      {% for r in form.tipo %}
+        <label for="{{ r.id_for_label }}">{{ r.tag }}<span><b>{{ r.choice_label }}</b><span class="small muted">{% if r.data.value == 'emergente' %}Se está formando, sin reconocimiento formal aún{% else %}Tiene resolución vigente de la facultad{% endif %}</span></span></label>
+      {% endfor %}
+    </div>
+  </div>
+  {% include 'includes/_campo.html' with f=form.categoria %}
+  {% include 'includes/_campo.html' with f=form.lugar %}
+  {% include 'includes/_campo.html' with f=form.descripcion full=1 %}
+  <div class="field full"><label>{{ form.integrantes_publicos.label }}{% pi 'P-25' %}</label>
+    <div class="radio-cards">
+      {% for r in form.integrantes_publicos %}
+        <label for="{{ r.id_for_label }}">{{ r.tag }}<span><b>{{ r.choice_label }}</b>{% if not forloop.first %}<span class="small muted">El resto ve solo a quien coordina</span>{% endif %}</span></label>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="form-foot">
+    <a class="btn btn-s" href="{% if editando %}{{ c.get_absolute_url }}{% else %}{% url 'comunidades:lista' %}{% endif %}">Cancelar</a>
+    <button class="btn btn-p">{% if editando %}Guardar cambios{% else %}Enviar para revisión{% endif %}</button>
+  </div>
+</form>
+{% endblock %}

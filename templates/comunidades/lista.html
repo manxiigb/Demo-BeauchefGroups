@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Comunidades · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head">
+  <div><h1>Comunidades{% pi 'P-34 / I1' %}</h1>
+    <p class="muted">{{ total }} comunidades activas en la FCFM. Los GG.OO. reconocidos tienen respaldo de la facultad; los grupos emergentes se están formando.</p></div>
+  {% if user.is_authenticated and rol != 'admin' %}<a class="btn btn-s" href="{% url 'comunidades:nueva' %}">Registrar mi comunidad</a>{% endif %}
+</div>
+
+<form class="filters" method="get" role="search">
+  <label class="search">{% icono 'search' 18 '1.8' 'color:var(--muted)' %}
+    <input id="q" name="q" type="search" placeholder="Busca por nombre, interés o lugar" value="{{ q }}" aria-label="Buscar comunidades"></label>
+  {# El tipo actual viaja oculto; si se presiona un botón, su valor llega después y es el que vale. #}
+  <input type="hidden" name="tipo" value="{{ tipo }}">
+  <div class="seg" role="group" aria-label="Tipo de comunidad">
+    {% for valor, etiqueta in tipos %}
+      <button name="tipo" value="{{ valor }}" aria-pressed="{% if tipo == valor %}true{% else %}false{% endif %}">{{ etiqueta }}</button>
+    {% endfor %}
+  </div>
+  <select id="cat" name="cat" class="inp" style="width:auto" aria-label="Categoría" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+    <option value="">Todas las categorías</option>
+    {% for valor, etiqueta in categorias %}<option value="{{ valor }}" {% if cat == valor %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  <noscript><button class="btn btn-s">Filtrar</button></noscript>
+</form>
+
+{% if comunidades %}
+  <div class="grid-com">{% for c in comunidades %}{% include 'includes/_comunidad_card.html' %}{% endfor %}</div>
+{% else %}
+  <div class="empty">No hay comunidades que coincidan{% if q %} con “{{ q }}”{% endif %}. Prueba otra palabra o <a href="{% url 'comunidades:nueva' %}">registra una nueva</a>.</div>
+{% endif %}
+{% endblock %}

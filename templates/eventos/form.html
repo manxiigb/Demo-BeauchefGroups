@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Publicar evento · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="head"><div><h1>Publicar evento{% pi 'P-09 / I1' %}</h1><p class="muted">Se publica en el feed de eventos y en la ficha de {{ comunidad.nombre }}.</p></div></div>
+<form class="panel form" method="post" novalidate>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors full field">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.comunidad.is_hidden %}{{ form.comunidad }}{% else %}{% include 'includes/_campo.html' with f=form.comunidad full=1 %}{% endif %}
+  {% include 'includes/_campo.html' with f=form.titulo full=1 %}
+  {% include 'includes/_campo.html' with f=form.fecha %}
+  <div class="time-pair">
+    {% include 'includes/_campo.html' with f=form.hora_inicio %}
+    {% include 'includes/_campo.html' with f=form.hora_fin %}
+  </div>
+  <div class="field full"><label>Modalidad</label>
+    <div class="radio-cards">
+      {% for r in form.modalidad %}
+        <label for="{{ r.id_for_label }}">{{ r.tag }}<span><b>{{ r.choice_label }}</b><span class="small muted">{% cycle 'En una sala o espacio de Beauchef' 'Enlace visible solo para inscritos' 'Sala y enlace a la vez' %}</span></span></label>
+      {% endfor %}
+    </div>
+  </div>
+  {% include 'includes/_campo.html' with f=form.lugar %}
+  {% include 'includes/_campo.html' with f=form.cupos %}
+  {% include 'includes/_campo.html' with f=form.descripcion full=1 %}
+  <div class="field full">
+    <label class="switch">{{ form.lista_espera }} {{ form.lista_espera.label }}{% pi 'P-14' %}</label>
+    <label class="switch">{{ form.pedir_confirmacion }} {{ form.pedir_confirmacion.label }}{% pi 'P-13' %}</label>
+  </div>
+  <div class="form-foot"><a class="btn btn-s" href="{{ comunidad.get_absolute_url }}">Cancelar</a><button class="btn btn-p">Publicar evento</button></div>
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block titulo %}{% if '404' == '403' %}Sin acceso{% else %}Página no encontrada{% endif %} · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<div class="login">
+  {% if '404' == '403' %}
+    <h1 style="font-size:1.5rem">No tienes acceso a esta sección</h1>
+    <p class="muted">Esta página es para la coordinación de una comunidad o para administración.{% if demo_mode %} Cambia de perfil en la barra morada de arriba.{% endif %}</p>
+  {% else %}
+    <h1 style="font-size:1.5rem">No encontramos esta página</h1>
+    <p class="muted">Puede que el enlace esté mal escrito o que el contenido ya no exista.</p>
+  {% endif %}
+  <a class="btn btn-s" href="{% url 'core:inicio' %}" style="align-self:flex-start">Volver al inicio</a>
+</div>
+{% endblock %}

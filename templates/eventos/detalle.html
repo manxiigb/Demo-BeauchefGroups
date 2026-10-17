@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}{{ e.titulo }} · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<a class="btn btn-g" href="{{ c.get_absolute_url }}" style="align-self:flex-start;padding-left:0">← {{ c.nombre }}</a>
+<div class="two">
+  <div class="stack" style="gap:20px">
+    <div class="stack" style="gap:8px">
+      <div class="row">{% include 'includes/_tipo_badge.html' %}<span class="chip">{{ e.get_modalidad_display }}</span></div>
+      <h1>{{ e.titulo }}</h1>
+      {% if e.descripcion %}<p class="muted" style="max-width:62ch">{{ e.descripcion|linebreaksbr }}</p>{% endif %}
+    </div>
+
+    <div class="panel" id="muro">
+      <div class="panel-h"><h2>Muro de consultas y avisos{% pi 'P-20 / I2' %}</h2><span class="small muted">{{ mensajes|length }} mensaje{{ mensajes|length|pluralize }}</span></div>
+      <div class="list">
+        {% for m in mensajes %}{% include 'includes/_mensaje.html' %}{% empty %}<p class="muted">Aún no hay consultas. Pregunta lo que necesites saber antes de ir.</p>{% endfor %}
+      </div>
+      {% if user.is_authenticated %}
+        <form class="compose" method="post" action="{% url 'eventos:publicar_mensaje' e.pk %}">{% csrf_token %}
+          <input name="texto" class="inp" placeholder="{% if es_coord %}Publica un aviso para las personas inscritas{% else %}Pregunta algo a la organización{% endif %}" aria-label="Mensaje" maxlength="1000" required>
+          <button class="btn btn-p">Publicar</button>
+        </form>
+      {% else %}
+        <p class="small muted" style="margin-top:12px"><a href="{% url 'core:login' %}?next={{ request.path|urlencode }}">Ingresa</a> para preguntar en el muro.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside class="panel rsvp" aria-label="Inscripción">
+    <dl class="kv">
+      <dt>Fecha</dt><dd>{{ e.inicio|date:"l j \d\e F"|capfirst }}</dd>
+      <dt>Hora</dt><dd class="tnum">{{ e.inicio|time:"H:i" }} a {{ e.fin|time:"H:i" }}</dd>
+      <dt>Lugar</dt><dd>{% if e.modalidad == 'remoto' and mi.estado != 'confirmada' and not es_coord %}Enlace visible al inscribirte{% else %}{{ e.lugar }}{% endif %}</dd>
+      <dt>Organiza</dt><dd><a href="{{ c.get_absolute_url }}">{{ c.nombre }}</a></dd>
+    </dl>
+    {% include 'includes/_cupos.html' %}
+
+    {% if not user.is_authenticated %}
+      <div class="rsvp-state info"><div><b>Ingresa para inscribirte</b>Usamos tu cuenta U. de Chile para reservar tu cupo.</div></div>
+      <a class="btn btn-p" href="{% url 'core:login' %}?next={{ request.path|urlencode }}">Ingresar con cuenta U. de Chile</a>
+    {% elif rol == 'admin' %}
+      <p class="small muted">Como administración puedes ver el evento y moderar su muro.</p>
+    {% elif es_coord %}
+      <p class="small muted">Organizas este evento. Hay {{ e.inscritos }} persona{{ e.inscritos|pluralize:"s" }} inscrita{{ e.inscritos|pluralize:"s" }}{% if e.en_espera %} y {{ e.en_espera }} en lista de espera{% endif %}.</p>
+    {% else %}
+      <form class="stack" method="post" action="{% url 'eventos:inscripcion' e.pk %}">{% csrf_token %}
+        {% if mi.estado == 'confirmada' %}
+          <div class="rsvp-state ok">{% icono 'check' 20 '2.2' %}<div><b>Tienes tu cupo</b>Te recordaremos 24 horas y 2 horas antes.{% pi 'P-17' %}</div></div>
+          <button class="btn btn-s" name="accion" value="cancelar">Cancelar inscripción</button>
+          <p class="small muted">Si cancelas, tu cupo pasa automáticamente a la primera persona en lista de espera.</p>
+        {% elif mi.estado == 'espera' %}
+          <div class="rsvp-state warn">{% icono 'clock' 20 '2' %}<div><b>Estás en lista de espera, posición {{ mi.posicion_espera }}</b>Si alguien cancela, te inscribimos y te avisamos.{% pi 'P-14' %}</div></div>
+          <button class="btn btn-s" name="accion" value="salir_espera">Salir de la lista de espera</button>
+        {% elif e.libres > 0 %}
+          <button class="btn btn-p btn-block" name="accion" value="inscribir">Inscribirme{% pi 'P-10' %}</button>
+          <p class="small muted">Puedes cancelar hasta el inicio del evento.</p>
+        {% elif e.lista_espera %}
+          <button class="btn btn-p btn-block" name="accion" value="inscribir">Unirme a la lista de espera{% pi 'P-14' %}</button>
+          <p class="small muted">Hay {{ e.en_espera }} persona{{ e.en_espera|pluralize }} antes que tú. Si se libera un cupo, quedas inscrito automáticamente.</p>
+        {% else %}
+          <p class="small muted">No quedan cupos y este evento no tiene lista de espera.</p>
+        {% endif %}
+      </form>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

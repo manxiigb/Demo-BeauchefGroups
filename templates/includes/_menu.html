@@ -1,0 +1,26 @@
+{% load ui %}
+<nav class="nav">
+  <a href="{% url 'core:inicio' %}" {% if nav_actual == 'inicio' %}aria-current="page"{% endif %}>{% icono 'home' %}<span>Inicio</span></a>
+  <a href="{% url 'comunidades:lista' %}" {% if nav_actual == 'comunidades' %}aria-current="page"{% endif %}>{% icono 'users' %}<span>Comunidades{% pi 'P-34' %}</span></a>
+  <a href="{% url 'eventos:lista' %}" {% if nav_actual == 'eventos' %}aria-current="page"{% endif %}>{% icono 'cal' %}<span>Eventos{% pi 'P-15' %}</span></a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'eventos:mis_inscripciones' %}" {% if nav_actual == 'mis' %}aria-current="page"{% endif %}>{% icono 'ticket' %}<span>Mis inscripciones</span></a>
+    <a href="{% url 'notificaciones:lista' %}" {% if nav_actual == 'notificaciones' %}aria-current="page"{% endif %}>{% icono 'bell' %}<span>Notificaciones</span>{% if notif_sin_leer %}<span class="count">{{ notif_sin_leer }}</span>{% endif %}</a>
+  {% endif %}
+
+  {% if mi_comunidad %}
+    <div class="nav-h">Mi comunidad</div>
+    <a href="{{ mi_comunidad.get_absolute_url }}" {% if nav_actual == 'mi_comunidad' %}aria-current="page"{% endif %}>{% icono 'sprout' %}<span>{{ mi_comunidad.nombre }}</span></a>
+    <a href="{% url 'eventos:nuevo' %}" {% if nav_actual == 'publicar' %}aria-current="page"{% endif %}>{% icono 'plus' %}<span>Publicar evento{% pi 'P-09' %}</span></a>
+  {% endif %}
+
+  {% if user.is_authenticated and rol != 'admin' %}
+    <div class="nav-h">Organiza</div>
+    <a href="{% url 'comunidades:nueva' %}" {% if nav_actual == 'registrar' %}aria-current="page"{% endif %}>{% icono 'sprout' %}<span>Registrar comunidad{% pi 'P-32' %}</span></a>
+  {% endif %}
+
+  {% if rol == 'admin' %}
+    <div class="nav-h">Administración</div>
+    <a href="{% url 'moderacion:panel' %}" {% if nav_actual == 'moderacion' %}aria-current="page"{% endif %}>{% icono 'shield' %}<span>Moderación{% pi 'P-39' %}</span>{% if pendientes_moderacion %}<span class="count">{{ pendientes_moderacion }}</span>{% endif %}</a>
+  {% endif %}
+</nav>

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}{{ c.nombre }} · Comunidades Beauchef{% endblock %}
+{% block contenido %}
+<a class="btn btn-g" href="{% url 'comunidades:lista' %}" style="align-self:flex-start;padding-left:0">← Comunidades</a>
+
+{% if c.estado != 'activa' %}
+  <div class="rsvp-state warn"><div><b>{{ c.get_estado_display }}</b>Esta ficha todavía no aparece en el directorio. Solo la ven coordinación y administración.</div></div>
+{% endif %}
+
+<section class="cover">
+  <span class="logo{% if c.es_emergente %} em{% endif %}">{{ c.iniciales }}</span>
+  <div class="cover-txt">
+    <div class="row">{% include 'includes/_tipo_badge.html' %}<span class="cat">{{ c.get_categoria_display }}</span></div>
+    <h1>{{ c.nombre }}{% pi 'P-16 / I1' %}</h1>
+    <p class="muted" style="max-width:64ch">{{ c.descripcion }}</p>
+    <div class="ev-meta"><span class="tnum">{{ n_integrantes }} integrantes</span>{% if c.activa_desde %}<span>Activa desde {{ c.activa_desde }}</span>{% endif %}{% if c.lugar %}<span>{{ c.lugar }}</span>{% endif %}</div>
+  </div>
+  <div class="row">
+    {% if es_coord %}
+      {% if c.estado == 'activa' %}<a class="btn btn-p" href="{% url 'eventos:nuevo' %}">Publicar evento</a>{% endif %}
+      <a class="btn btn-s" href="{% url 'comunidades:editar' c.slug %}">Editar ficha</a>
+    {% elif es_integrante %}
+      <form method="post" action="{% url 'comunidades:salir' c.slug %}">{% csrf_token %}<button class="btn btn-s">Salir de la comunidad</button></form>
+    {% elif user.is_authenticated %}
+      <form method="post" action="{% url 'comunidades:unirse' c.slug %}">{% csrf_token %}<button class="btn btn-p">Unirme</button></form>
+    {% else %}
+      <a class="btn btn-p" href="{% url 'core:login' %}?next={{ request.path|urlencode }}">Ingresa para unirte</a>
+    {% endif %}
+  </div>
+</section>
+
+{% if c.es_emergente and es_coord %}
+  <div class="rsvp-state info">{% icono 'sprout' 20 %}<div><b>Tu grupo aparece en el directorio desde el primer día.</b>Cuando la facultad reconozca a {{ c.nombre }} como GG.OO., la insignia cambia. Mientras tanto tienes eventos, cupos y muro igual que cualquier comunidad.{% pi 'P-39' %}</div></div>
+{% endif %}
+
+<div class="tabs" role="tablist">
+  <a role="tab" class="tab" href="?tab=eventos" aria-selected="{% if tab == 'eventos' %}true{% else %}false{% endif %}">Eventos ({{ eventos|length }})</a>
+  <a role="tab" class="tab" href="?tab=foro" aria-selected="{% if tab == 'foro' %}true{% else %}false{% endif %}">Foro</a>
+  <a role="tab" class="tab" href="?tab=integrantes" aria-selected="{% if tab == 'integrantes' %}true{% else %}false{% endif %}">Integrantes</a>
+</div>
+
+{% if tab == 'foro' %}
+  <div class="panel">{% pi 'P-33 / I2' %}
+    <div class="list">
+      {% for m in mensajes %}{% include 'includes/_mensaje.html' %}{% empty %}<p class="muted">Todavía no hay mensajes. Escribe el primero.</p>{% endfor %}
+    </div>
+    {% if user.is_authenticated %}
+      <form class="compose" method="post" action="{% url 'comunidades:publicar_foro' c.slug %}">{% csrf_token %}
+        <input name="texto" class="inp" placeholder="Escribe un mensaje para la comunidad" aria-label="Mensaje" maxlength="1000" required>
+        <button class="btn btn-p">Publicar</button>
+      </form>
+    {% else %}
+      <p class="small muted" style="margin-top:12px"><a href="{% url 'core:login' %}?next={{ request.get_full_path|urlencode }}">Ingresa</a> para escribir en el foro.</p>
+    {% endif %}
+  </div>
+{% elif tab == 'integrantes' %}
+  <div class="panel">
+    {% if ver_integrantes %}
+      <div class="people">
+        {% for mb in membresias %}
+          <div class="person"><span class="avatar">{{ mb.usuario.get_full_name|iniciales }}</span>
+            <div><b style="font-size:.9rem;display:block">{{ mb.usuario.get_full_name }}</b><span class="small muted">{{ mb.get_rol_display }}</span></div></div>
+        {% endfor %}
+      </div>
+      {% if n_integrantes > membresias|length %}<p class="small muted" style="margin-top:12px">y {{ n_integrantes|add:"-12" }} personas más</p>{% endif %}
+    {% else %}
+      <div class="lock">{% icono 'shield' 20 %}<span>Esta comunidad mantiene su lista de integrantes privada. Coordinación: {% for u in c.coordinadores %}{{ u.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% pi 'P-25 Privacidad' %}</span></div>
+    {% endif %}
+  </div>
+{% else %}
+  {% if eventos %}
+    <div class="grid-ev">{% for e in eventos %}{% include 'includes/_evento_card.html' %}{% endfor %}</div>
+  {% else %}
+    <div class="empty">Esta comunidad aún no publica eventos.</div>
+  {% endif %}
+{% endif %}
+{% endblock %}

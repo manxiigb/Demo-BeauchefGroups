@@ -1,0 +1,17 @@
+{% comment %}Barra morada para cambiar de perfil durante la demo. Se oculta con DEMO_MODE = False.{% endcomment %}
+<div class="demo" role="region" aria-label="Controles de la demo">
+  <b>Demo</b>
+  <span class="hide-m">Ver como:</span>
+  <form method="post" action="{% url 'core:demo_como' %}">{% csrf_token %}
+    <input type="hidden" name="volver" value="{{ request.get_full_path }}">
+    <div class="roles">
+      {% for clave, etiqueta, _ in demo_roles %}
+        <button name="rol" value="{{ clave }}" aria-pressed="{% if rol == clave %}true{% else %}false{% endif %}">{{ etiqueta }}</button>
+      {% endfor %}
+    </div>
+  </form>
+  <span class="sp"></span>
+  <label><input type="checkbox" id="toggle-pi"> Post-its del tablero</label>
+  <a href="{% url 'core:mapa_django' %}" style="color:var(--demo)">Mapa Django</a>
+  <a href="/admin/" style="color:var(--demo)" class="hide-m">Admin</a>
+</div>

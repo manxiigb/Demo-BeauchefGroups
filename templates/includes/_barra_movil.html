@@ -1,0 +1,20 @@
+{% load ui %}
+<nav class="tabbar" aria-label="Navegación">
+  <a href="{% url 'core:inicio' %}" {% if nav_actual == 'inicio' %}aria-current="page"{% endif %}>{% icono 'home' %}<span>Inicio</span></a>
+  <a href="{% url 'comunidades:lista' %}" {% if nav_actual == 'comunidades' %}aria-current="page"{% endif %}>{% icono 'users' %}<span>Comunidades</span></a>
+  <a href="{% url 'eventos:lista' %}" {% if nav_actual == 'eventos' %}aria-current="page"{% endif %}>{% icono 'cal' %}<span>Eventos</span></a>
+  {% if rol == 'admin' %}
+    <a href="{% url 'moderacion:panel' %}" {% if nav_actual == 'moderacion' %}aria-current="page"{% endif %}>{% icono 'shield' %}<span>Moderación</span></a>
+  {% elif mi_comunidad %}
+    <a href="{% url 'eventos:nuevo' %}" {% if nav_actual == 'publicar' %}aria-current="page"{% endif %}>{% icono 'plus' %}<span>Publicar</span></a>
+  {% elif user.is_authenticated %}
+    <a href="{% url 'eventos:mis_inscripciones' %}" {% if nav_actual == 'mis' %}aria-current="page"{% endif %}>{% icono 'ticket' %}<span>Inscripciones</span></a>
+  {% else %}
+    <a href="{% url 'core:login' %}" {% if nav_actual == 'login' %}aria-current="page"{% endif %}>{% icono 'ticket' %}<span>Ingresar</span></a>
+  {% endif %}
+  {% if user.is_authenticated %}
+    <a href="{% url 'notificaciones:lista' %}" {% if nav_actual == 'notificaciones' %}aria-current="page"{% endif %}>{% icono 'bell' %}<span>Avisos</span></a>
+  {% else %}
+    <a href="{% url 'comunidades:nueva' %}">{% icono 'sprout' %}<span>Organiza</span></a>
+  {% endif %}
+</nav>

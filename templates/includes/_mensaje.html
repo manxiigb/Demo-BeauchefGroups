@@ -1,0 +1,24 @@
+{% load ui %}{% comment %}Mensaje de muro o foro. Recibe «m», «coordinadores_ids» y «motivos».{% endcomment %}
+{% if m.oculto %}
+  <div class="msg"><span></span><p class="hidden-msg">Mensaje ocultado por moderación.</p></div>
+{% else %}
+  <div class="msg{% if m.autor_id in coordinadores_ids %} coord{% endif %}">
+    <span class="avatar">{{ m.autor.get_full_name|iniciales }}</span>
+    <div class="msg-body">
+      <div class="msg-h"><b>{{ m.autor.get_full_name }}</b>{% if m.autor_id in coordinadores_ids %}<span class="tag-coord">Coordinación</span>{% endif %}<span class="small muted">hace {{ m.creado|timesince }}</span></div>
+      <p>{{ m.texto|linebreaksbr }}</p>
+      {% if user.is_authenticated and m.autor_id != user.pk and m.autor_id not in coordinadores_ids %}
+        <details class="reportar">
+          <summary>Reportar{% pi 'P-35' %}</summary>
+          <form class="report" method="post" action="{% url 'moderacion:reportar' m.pk %}">{% csrf_token %}
+            <b class="small">¿Por qué reportas este mensaje?</b>
+            {% for valor, etiqueta in motivos %}
+              <label><input type="radio" name="motivo" value="{{ valor }}" {% if forloop.first %}checked{% endif %}> {{ etiqueta }}</label>
+            {% endfor %}
+            <div class="row"><button class="btn btn-d">Enviar reporte</button></div>
+          </form>
+        </details>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
