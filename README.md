@@ -5,7 +5,7 @@ App para descubrir GG.OO. y grupos emergentes de la FCFM, inscribirse a sus even
 ## Cómo correrlo (Windows, PowerShell)
 
 ```powershell
-cd ~\Demo-Rosa-Parks
+cd ~\Demo-BeauchefGroups
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python manage.py migrate
